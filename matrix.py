@@ -16,7 +16,7 @@ class Matrix:
                 for j in range(cols):
                     self.matrix[i].append(0)
 #initialize the matrix with random numbers
-        def randomize(self):
+    def randomize(self):
             for i in range(len(self.metrix)):
                 for j in range(len(self.metrix[i])):
                     self.metrix[i][j] = random.uniform(-1, 1)
@@ -111,6 +111,7 @@ class Matrix:
                 m.metrix[i][j] = result
         return m
 #convert array to a one colum matrix(vector)
+    @staticmethod
     def array_to_vector(m):
         if (isinstance(m, list)):
             result = Matrix(len(m), 1)
