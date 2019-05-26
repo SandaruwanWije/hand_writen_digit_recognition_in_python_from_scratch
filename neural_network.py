@@ -10,13 +10,16 @@ class NeuralNetwork:
     error = 0
     lr = 0.1
 #initialize the  neural network layers, weights and biases
-    def __init__(self, no_of_input, no_of_hidden, no_of_output, path, weight_file="weights.txt"):
+    def __init__(self, no_of_input, no_of_hidden, no_of_output, weight_file="weights.txt"):
+        user_cancel = False
+        if (weight_file == ""):
+            user_cancel = True
         self.num_of_input_nurons = no_of_input;
         self.num_of_hiddden_nurons = no_of_hidden;
         self.num_of_output_nurons = no_of_output;
 #check if exist the weights of the local drive
-        isWeightsExist = Path(path).exists()
-        if(isWeightsExist):
+        isWeightsExist = Path(weight_file).exists()
+        if(isWeightsExist and not user_cancel):
             f = open(weight_file, "r")
             f1 = f.readlines()
             w = []
@@ -40,7 +43,7 @@ class NeuralNetwork:
             for i in range(no_of_hidden):
                 b_h.append([])
                 for j in range(1):
-                    b_h[i].append(b[b_count])
+                    b_h[i] = b[b_count]
                     b_count = b_count + 1
             for i in range(no_of_output):
                 w_h_o.append([])
@@ -50,10 +53,10 @@ class NeuralNetwork:
             for i in range(no_of_output):
                 b_o.append([])
                 for j in range(1):
-                    b_o[i].append(b[b_count])
+                    b_o[i] = b[b_count]
                     b_count = b_count + 1
-            self.weight_iput_to_hidden = Matrix.array_to_vector(w_i_h)
-            self.weight_hidden_to_output = Matrix.array_to_vector(w_h_o)
+            self.weight_iput_to_hidden = Matrix.array_to_matrix(w_i_h, no_of_hidden, no_of_input)
+            self.weight_hidden_to_output = Matrix.array_to_matrix(w_h_o, no_of_output, no_of_hidden)
             self.bias_of_hidden = Matrix.array_to_vector(b_h)
             self.bias_of_output = Matrix.array_to_vector(b_o)
         else:
@@ -101,7 +104,7 @@ class NeuralNetwork:
         weight_hidden_to_output_t = Matrix.transpose(self.weight_hidden_to_output)
         hidden_error = Matrix.dot_product(weight_hidden_to_output_t, error)
 #calculate the gradient of the hidden layer
-        hidden_gradient_matrix = Matrix.map(output, NeuralNetwork.d_sigmoid)
+        hidden_gradient_matrix = Matrix.map_s(output, NeuralNetwork.d_sigmoid)
         hidden_gradient_matrix.scale(error)
         hidden_gradient_matrix.scale(self.lr)
         delta_weights_ho = Matrix.dot_product(output, Matrix.transpose(hidden))
@@ -109,7 +112,7 @@ class NeuralNetwork:
         self.weight_hidden_to_output.add(delta_weights_ho)
         self.bias_of_output.add(hidden_gradient_matrix)
 #calculate the gradient of the output layer
-        output_gradient_matrix = Matrix.map(hidden, NeuralNetwork.d_sigmoid)
+        output_gradient_matrix = Matrix.map_s(hidden, NeuralNetwork.d_sigmoid)
         output_gradient_matrix.scale(hidden_error)
         output_gradient_matrix.scale(self.lr)
         delta_weights_ih = Matrix.dot_product(hidden, Matrix.transpose(inputs))

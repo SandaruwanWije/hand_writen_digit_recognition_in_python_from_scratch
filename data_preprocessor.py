@@ -37,7 +37,6 @@ class DataPreprocessor:
         data_dict = {}
         for file in files:
             if file.endswith('ubyte'):  # FOR ALL 'ubyte' FILES
-                print('Reading ', file)
                 with open(datapath + file, 'rb') as f:
                     data = f.read()
                     type = get_int(data[:4])  # 0-3: THE MAGIC NUMBER TO WHETHER IMAGE OR LABEL
@@ -67,10 +66,14 @@ class DataPreprocessor:
             labels = data_dict[set + '_labels']  # LABELS
             no_of_samples = images.shape[0]  # NUBMER OF SAMPLES
             for indx in range(no_of_samples):  # FOR EVERY SAMPLE
-                print(set, indx)
                 image = images[indx]  # GET IMAGE
                 label = labels[indx]  # GET LABEL
 
         # DUMPING THE DICTIONARY INTO A PICKLE
-        with open(datapath + 'MNISTData.pkl', 'wb') as fp:
+        pkl_path = "data_pkl/"
+        if (not Path(pkl_path).exists()):
+            os.mkdir(pkl_path)
+        with open(pkl_path + 'MNISTData.pkl', 'wb') as fp:
             pickle.dump(data_dict, fp)
+        print("dataset reading complete.")
+        return data_dict
